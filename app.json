@@ -1,0 +1,6 @@
+{
+    "name": "derwolfe.net",
+    "description": "derwolfe.net static site server",
+    "image": "heroku/clojure",
+    "addons": []
+}
