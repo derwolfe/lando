@@ -1,11 +1,10 @@
 (ns lando.web
-  (:use [org.httpkit.server :only [run-server]])
   (:require [compojure.core :refer [defroutes]]
+            [aleph.http :as http]
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [clojure.java.io :as io]
             [ring.util.response :as response]
-            [ring.middleware.reload :as reload]
             [ring.middleware.resource]
             [ring.middleware.content-type]
             [ring.middleware.not-modified]
@@ -42,11 +41,12 @@
 (def app
   (-> (site all-routes)
       (ring.middleware.resource/wrap-resource "public")
-      (wrap-dir-index)
       (ring.middleware.content-type/wrap-content-type)
       (ring.middleware.not-modified/wrap-not-modified)
-      (ring.middleware.ssl/wrap-hsts)
-      (wrap-force-tls)))
+      (wrap-dir-index)
+      ;; (ring.middleware.ssl/wrap-hsts)
+      ;; (wrap-force-tls)
+      ))
 
 (defn -main [& args]
-  (run-server app {:port 8080}))
+  (http/start-server app {:port 8080}))
