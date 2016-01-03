@@ -6,10 +6,10 @@
             [clojure.java.io :as io]
             [ring.util.response :as response]
             [ring.middleware.reload :as reload]
-            [ring.middleware.resource :as rmr]
-            [ring.middleware.content-type :as rmct]
-            [ring.middleware.not-modified :as rmnm]
-            [ring.middleware.ssl :as rms]
+            [ring.middleware.resource]
+            [ring.middleware.content-type]
+            [ring.middleware.not-modified]
+            [ring.middleware.ssl]
             [environ.core :refer [env]]))
 
 (defn wrap-dir-index
@@ -25,9 +25,6 @@
                     uri))))))
 
 (defn wrap-force-tls
-  "Almost like in lib-noir.
-   If the request's scheme is not https [and is for 'secure.'], redirect with https.
-   Also checks the X-Forwarded-Proto header."
   [app]
   (fn [req]
     (let [headers (:headers req)
@@ -44,11 +41,11 @@
 
 (def app
   (-> (site all-routes)
-      (rmr/wrap-resource "public")
-      (rmct/wrap-content-type)
-      (rmnm/wrap-not-modified)
+      (ring.middleware.resource/wrap-resource "public")
       (wrap-dir-index)
-      (rms/wrap-hsts)
+      (ring.middleware.content-type/wrap-content-type)
+      (ring.middleware.not-modified/wrap-not-modified)
+      (ring.middleware.ssl/wrap-hsts)
       (wrap-force-tls)))
 
 (defn -main [& args]
